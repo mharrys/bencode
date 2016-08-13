@@ -13,7 +13,7 @@ object Bencode {
     case _ => Left("not implemented")
   }
 
-  private def decodeInt(dataInt: String): Either[String, BValue] = {
+  private def decodeInt(dataInt: String): Either[String, BInt] = {
     @annotation.tailrec
     def parse(data: String, acc: Seq[Char]): Either[String, BInt] = data match {
       case d if d.isEmpty => Left("Unexpected ending while parsing int")
