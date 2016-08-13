@@ -17,7 +17,7 @@ class BencodeSuite extends FunSuite with Checkers
 
   test("can decode string") {
     // edge case
-    Bencode.decode(s"0:") shouldEqual (Right(BStr("")))
+    Bencode.decode("0:") shouldEqual (Right(BStr("")))
     check((s: String) => {
       Bencode.decode(s"${s.length}:${s}") == Right(BStr(s)) &&
       Bencode.decode(s"${s.length}:${s}${s}") == Right(BStr(s)) &&
