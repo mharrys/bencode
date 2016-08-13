@@ -20,10 +20,12 @@ object Bencode {
         decodeInt(data)
       case d if d startsWith "l" =>
         decodeList(data)
+      case d if d startsWith "d" =>
+        decodeDict(data)
       case d if dataStrStart.length > 0 =>
         decodeStr(data, dataStrStart)
       case _ =>
-        Left("not implemented")
+        Left("Unknown type")
     }
   }
 
@@ -44,7 +46,7 @@ object Bencode {
       case d =>
         parse(data drop 1, acc :+ d.head)
     }
-    parse(dataInt drop 1, Seq())
+    parse(dataInt drop 1, Seq.empty)
   }
 
   private def decodeList(dataList: String): Either[String, (BList, String)] = {
@@ -63,7 +65,31 @@ object Bencode {
             Left("Unable to parse list item: " + error)
         }
     }
-    parse(dataList drop 1, Seq())
+    parse(dataList drop 1, Seq.empty)
+  }
+
+  private def decodeDict(dataDict: String): Either[String, (BDict, String)] = {
+    @annotation.tailrec
+    def parse(data: String, acc: Map[String, BValue]): Either[String, (BDict, String)] = data match {
+      case d if d.isEmpty =>
+        Left("Unexpected ending while parsing dictionary")
+      case d if d startsWith("e") =>
+        val tail = data drop 1
+        Right((BDict(acc), tail))
+      case d =>
+        decodeType(data) match {
+          case Right((BStr(name), t1)) =>
+            decodeType(t1) match {
+              case Right((item, t2)) =>
+                parse(t2, acc + (name -> item))
+              case Left(error) =>
+                Left("Unable to parse dictionary item: " + error)
+            }
+          case _ =>
+            Left("Unable to parse dictionary name")
+        }
+    }
+    parse(dataDict drop 1, Map.empty)
   }
 
   private def decodeStr(dataStr: String, dataStrStart: String): Either[String, (BStr, String)] = {
