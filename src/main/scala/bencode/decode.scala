@@ -1,14 +1,9 @@
-sealed trait BValue;
+package bencode
 
 import scala.util.{Failure, Success, Try, Right, Left}
 
-case class BInt(value: Int) extends BValue;
-case class BStr(value: String) extends BValue;
-case class BList(value: Seq[BValue]) extends BValue;
-case class BDict(value: Map[String, BValue]) extends BValue;
-
-object Bencode {
-  def decode(data: String): Either[String, BValue] = decodeType(data) match {
+object decode {
+  def apply(data: String): Either[String, BValue] = decodeType(data) match {
     case Right((result, _)) =>
       Right(result)
     case Left(error) =>
