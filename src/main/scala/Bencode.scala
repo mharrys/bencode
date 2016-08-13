@@ -9,8 +9,11 @@ case class BDict(value: Map[String, BValue]) extends BValue;
 
 object Bencode {
   def decode(data: String): Either[String, BValue] = decodeType(data) match {
-    case Right((result, _)) => Right(result)
-    case Left(error) => Left(error)
+    case Right((result, _)) =>
+      Right(result)
+    case Left(error) =>
+      // need to re-wrap since this method use BValue
+      Left(error)
   }
 
   private def decodeType(data: String): Either[String, (BValue, String)] = {
