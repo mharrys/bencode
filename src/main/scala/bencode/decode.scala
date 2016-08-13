@@ -2,6 +2,24 @@ package bencode
 
 import scala.util.{Failure, Success, Try, Right, Left}
 
+/** Attempts to decode string decoded in Bencode as Right(BValue) if possible,
+  * otherwise Left(String) is returned with a error message.
+  *
+  * == Example ==
+  * {{{
+  * scala> decode("i42e")
+  * => Right(BInt(42))
+  *
+  * scala> decode("3:foo")
+  * => Right(BStr(foo))
+  *
+  * scala> decode("li42e3:fooe")
+  * => Right(BList(List(BInt(42), BStr(foo))))
+  *
+  * scala> decode("d3:fooi42ee")
+  * => Right(BDict(Map(foo -> BInt(42))))
+  * }}}
+  */
 object decode {
   def apply(data: String): Either[String, BValue] = decodeType(data) match {
     case Right((result, _)) =>
