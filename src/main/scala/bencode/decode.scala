@@ -54,15 +54,14 @@ object decode {
         val numberStr = acc.mkString
         Try(numberStr.toInt) match {
           case Success(n) =>
-            val tail = data drop 1
-            Right((BInt(n), tail))
+            Right((BInt(n), data.tail))
           case Failure(_) =>
             Left(s"Unable to parse $numberStr as int")
         }
       case d =>
-        parse(data drop 1, acc :+ d.head)
+        parse(data.tail, acc :+ d.head)
     }
-    parse(dataInt drop 1, Seq.empty)
+    parse(dataInt.tail, Seq.empty)
   }
 
   private def decodeList(dataList: String): Either[String, (BList, String)] = {
@@ -71,8 +70,7 @@ object decode {
       case d if d.isEmpty =>
         Left("Unexpected ending while parsing list")
       case d if d startsWith("e") =>
-        val tail = data drop 1
-        Right((BList(acc), tail))
+        Right((BList(acc), data.tail))
       case d =>
         decodeType(data) match {
           case Right((item, tail)) =>
@@ -81,7 +79,7 @@ object decode {
             Left("Unable to parse list item: " + error)
         }
     }
-    parse(dataList drop 1, Seq.empty)
+    parse(dataList.tail, Seq.empty)
   }
 
   private def decodeDict(dataDict: String): Either[String, (BDict, String)] = {
@@ -90,8 +88,7 @@ object decode {
       case d if d.isEmpty =>
         Left("Unexpected ending while parsing dictionary")
       case d if d startsWith("e") =>
-        val tail = data drop 1
-        Right((BDict(acc), tail))
+        Right((BDict(acc), data.tail))
       case d =>
         decodeType(data) match {
           case Right((BStr(name), t1)) =>
@@ -105,7 +102,7 @@ object decode {
             Left("Unable to parse dictionary name")
         }
     }
-    parse(dataDict drop 1, Map.empty)
+    parse(dataDict.tail, Map.empty)
   }
 
   private def decodeStr(dataStr: String, dataStrStart: String): Either[String, (BStr, String)] = {
@@ -113,7 +110,7 @@ object decode {
     val dataStrTail = dataStr drop dataStrStart.length
     val dataStrLength = dataStrTail.length - 1 // -1 accounts for ":"
     if (dataStrTail.startsWith(":") && dataStrLength >= strLength) {
-      val (strContent, tail) = dataStrTail drop 1 splitAt strLength
+      val (strContent, tail) = dataStrTail.tail.splitAt(strLength)
       Right((BStr(strContent), tail))
     } else
       Left("Unexpected ending while parsing string")
