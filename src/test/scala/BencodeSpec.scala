@@ -15,6 +15,30 @@ class BencodeSuite extends FunSuite with Checkers
     })
   }
 
+  test("can decode list") {
+    Bencode.decode("le") shouldEqual (Right(BList(List())))
+    Bencode.decode("llee") shouldEqual Right(BList(List(BList(List()))))
+    // nested lists with arbitrary ints and strings
+    check((n: Int, s: String) =>
+      Bencode.decode(s"li${n}e${s.length}:${s}e") ==
+        Right(
+          BList(List(
+            BInt(n), BStr(s))))
+      &&
+      Bencode.decode(s"llli${n}eel${s.length}:${s}eee${s}") ==
+        Right(
+          BList(List(
+            BList(List(
+              BList(List(BInt(n))),
+              BList(List(BStr(s))))))))
+    )
+    // ivalid
+    Bencode.decode("l").isLeft shouldEqual (true)
+    Bencode.decode("lle").isLeft shouldEqual (true)
+    Bencode.decode("li42ei42e").isLeft shouldEqual (true)
+    Bencode.decode("lli42ei42ee").isLeft shouldEqual (true)
+  }
+
   test("can decode string") {
     // edge case
     Bencode.decode("0:") shouldEqual (Right(BStr("")))
