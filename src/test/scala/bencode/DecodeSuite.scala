@@ -3,9 +3,9 @@ package bencode
 import org.scalatest.{FunSuite, Matchers}
 import org.scalatest.prop.{Checkers, GeneratorDrivenPropertyChecks}
 
-class BencodeSuite extends FunSuite with Checkers
-                                    with Matchers
-                                    with GeneratorDrivenPropertyChecks {
+class DecodeSuite extends FunSuite with Checkers
+                                   with Matchers
+                                   with GeneratorDrivenPropertyChecks {
   test("can decode integer") {
     check((n: Int) => {
       decode(s"i${n}e") == Right(BInt(n)) &&
