@@ -1,5 +1,22 @@
 package bencode
 
+/** Encodes BValue to Bencode string.
+  *
+  * == Example ==
+  * {{{
+  * scala> encode(BInt(42))
+  * => i42e
+  *
+  * scala> encode(BStr("foo"))
+  * => 3:foo
+  *
+  * scala> encode(BList(List(BInt(42), BStr("foo"))))
+  * => li42e3:fooe
+  *
+  * scala> encode(BDict(Map("foo" -> BInt(42))))
+  * => d3:fooi42ee
+  * }}}
+  */
 object encode {
   def apply(data: BValue): String = encodeType(data)
 
