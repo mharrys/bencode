@@ -3,7 +3,7 @@ package bencode
 object encode {
   def apply(data: BValue): String = encodeType(data)
 
-  def encodeType(data: BValue): String = data match {
+  private def encodeType(data: BValue): String = data match {
     case BInt(i) =>
       s"i${i}e"
     case BList(l) =>
@@ -14,7 +14,7 @@ object encode {
       s"${s.length}:${s}"
   }
 
-  def encodeDictItem(tuple: (String, BValue)): String = {
+  private def encodeDictItem(tuple: (String, BValue)): String = {
     val s = tuple._1
     val v = tuple._2
     s"${s.length}:${s}${encodeType(v)}"
