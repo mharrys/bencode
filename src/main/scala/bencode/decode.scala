@@ -30,7 +30,6 @@ object decode {
   }
 
   private def decodeType(data: String): Either[String, (BValue, String)] = {
-    lazy val dataStrStart = data takeWhile(Character.isDigit(_))
     data match {
       case d if d startsWith "i" =>
         decodeInt(data)
@@ -38,10 +37,8 @@ object decode {
         decodeList(data)
       case d if d startsWith "d" =>
         decodeDict(data)
-      case d if dataStrStart.length > 0 =>
-        decodeStr(data, dataStrStart)
       case _ =>
-        Left("Unknown type")
+        decodeStr(data)
     }
   }
 
@@ -105,14 +102,18 @@ object decode {
     parse(dataDict.tail, Map.empty)
   }
 
-  private def decodeStr(dataStr: String, dataStrStart: String): Either[String, (BStr, String)] = {
-    val strLength = dataStrStart.toInt
-    val dataStrTail = dataStr drop dataStrStart.length
-    val dataStrLength = dataStrTail.length - 1 // -1 accounts for ":"
-    if (dataStrTail.startsWith(":") && dataStrLength >= strLength) {
-      val (strContent, tail) = dataStrTail.tail.splitAt(strLength)
-      Right((BStr(strContent), tail))
+  private def decodeStr(dataStr: String): Either[String, (BStr, String)] = {
+    val dataStrStart = dataStr takeWhile(Character.isDigit(_))
+    if (dataStrStart.length > 0) {
+      val strLength = dataStrStart.toInt
+      val dataStrTail = dataStr drop dataStrStart.length
+      val dataStrLength = dataStrTail.length - 1 // -1 accounts for ":"
+      if (dataStrTail.startsWith(":") && dataStrLength >= strLength) {
+        val (strContent, tail) = dataStrTail.tail.splitAt(strLength)
+        Right((BStr(strContent), tail))
+      } else
+        Left("Unexpected ending while parsing string")
     } else
-      Left("Unexpected ending while parsing string")
+      Left("String must start with digits")
   }
 }

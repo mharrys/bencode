@@ -105,5 +105,11 @@ class DecodeSuite extends FunSuite with Checkers
         decode(s"${s.length}${c}${s}").isLeft
       }
     }
+    // test random strings that do not start with i, l or d
+    forAll { (s: String) =>
+      whenever (!s.startsWith("i") && !s.startsWith("l") && !s.startsWith("d")) {
+        decode(s).isLeft
+      }
+    }
   }
 }
