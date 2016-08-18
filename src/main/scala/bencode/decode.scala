@@ -85,7 +85,7 @@ object decode {
       case d if d startsWith("e") =>
         Right((BDict(acc), data.tail))
       case d =>
-        decodeType(data) match {
+        decodeStr(data) match {
           case Right((BStr(name), t1)) =>
             decodeType(t1) match {
               case Right((item, t2)) =>
