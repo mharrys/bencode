@@ -21,22 +21,22 @@ class DecodeSuite extends FunSuite with Checkers
   }
 
   test("can decode list") {
-    decode("le") shouldEqual (Right(BList(List())))
-    decode("llee") shouldEqual Right(BList(List(BList(List()))))
-    decode("llleee") shouldEqual Right(BList(List(BList(List(BList(List()))))))
+    decode("le") shouldEqual (Right(BList()))
+    decode("llee") shouldEqual Right(BList(BList()))
+    decode("llleee") shouldEqual Right(BList(BList(BList())))
     // nested lists with arbitrary ints and strings
     check((n: Int, s: String) =>
       decode(s"li${n}e${s.length}:${s}e") ==
         Right(
-          BList(List(
-            BInt(n), BStr(s))))
+          BList(
+            BInt(n), BStr(s)))
       &&
       decode(s"llli${n}eel${s.length}:${s}eee${s}") ==
         Right(
-          BList(List(
-            BList(List(
-              BList(List(BInt(n))),
-              BList(List(BStr(s))))))))
+          BList(
+            BList(
+              BList(BInt(n)),
+              BList(BStr(s)))))
     )
     // ivalid
     decode("l").isLeft shouldEqual (true)
@@ -49,27 +49,23 @@ class DecodeSuite extends FunSuite with Checkers
     // edge case
     decode("de") shouldEqual (
       Right(
-        BDict(
-          Map.empty)))
+        BDict()))
     check((name: String, value: Int) => {
       // string -> int map
       decode(s"d${name.length}:${name}i${value}ee") ==
         Right(
           BDict(
-            Map(
-              name -> BInt(value))))
+              name -> BInt(value)))
       // nested list
       decode(s"d${name.length}:${name}li${value}eee") ==
         Right(
           BDict(
-            Map(
-              name -> BList(List(BInt(value))))))
+              name -> BList(BInt(value))))
       // nested dictionary
       decode(s"d3:food${name.length}:${name}i${value}eee") ==
         Right(
           BDict(
-            Map(
-              "foo" -> BDict(Map(name -> BInt(value))))))
+              "foo" -> BDict(Map(name -> BInt(value)))))
     })
     // invalid
     decode("d").isLeft shouldEqual (true)

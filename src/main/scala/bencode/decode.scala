@@ -47,7 +47,7 @@ object decode {
 
   private def decodeInt(dataInt: String): Either[String, (BInt, String)] = {
     @annotation.tailrec
-    def parse(data: String, acc: Seq[Char]): Either[String, (BInt, String)] = data match {
+    def parse(data: String, acc: Vector[Char]): Either[String, (BInt, String)] = data match {
       case d if d.isEmpty =>
         Left("Unexpected ending while parsing int")
       case d if d startsWith("e") =>
@@ -61,12 +61,12 @@ object decode {
       case d =>
         parse(data.tail, acc :+ d.head)
     }
-    parse(dataInt.tail, Seq.empty)
+    parse(dataInt.tail, Vector.empty)
   }
 
   private def decodeList(dataList: String): Either[String, (BList, String)] = {
     @annotation.tailrec
-    def parse(data: String, acc: Seq[BValue]): Either[String, (BList, String)] = data match {
+    def parse(data: String, acc: Vector[BValue]): Either[String, (BList, String)] = data match {
       case d if d.isEmpty =>
         Left("Unexpected ending while parsing list")
       case d if d startsWith("e") =>
@@ -79,7 +79,7 @@ object decode {
             Left("Unable to parse list item: " + error)
         }
     }
-    parse(dataList.tail, Seq.empty)
+    parse(dataList.tail, Vector.empty)
   }
 
   private def decodeDict(dataDict: String): Either[String, (BDict, String)] = {
