@@ -29,17 +29,15 @@ object decode {
       Left(error)
   }
 
-  private def decodeType(data: String): Either[String, (BValue, String)] = {
-    data match {
-      case d if d startsWith "i" =>
-        decodeInt(data)
-      case d if d startsWith "l" =>
-        decodeList(data)
-      case d if d startsWith "d" =>
-        decodeDict(data)
-      case _ =>
-        decodeStr(data)
-    }
+  private def decodeType(data: String): Either[String, (BValue, String)] = data match {
+    case d if d startsWith "i" =>
+      decodeInt(data)
+    case d if d startsWith "l" =>
+      decodeList(data)
+    case d if d startsWith "d" =>
+      decodeDict(data)
+    case _ =>
+      decodeStr(data)
   }
 
   private def decodeInt(dataInt: String): Either[String, (BInt, String)] = {
