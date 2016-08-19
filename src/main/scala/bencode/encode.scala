@@ -10,10 +10,10 @@ package bencode
   * scala> encode(BStr("foo"))
   * => 3:foo
   *
-  * scala> encode(BList(List(BInt(42), BStr("foo"))))
+  * scala> encode(BList(BInt(42), BStr("foo")))
   * => li42e3:fooe
   *
-  * scala> encode(BDict(Map("foo" -> BInt(42))))
+  * scala> encode(BDict("foo" -> BInt(42)))
   * => d3:fooi42ee
   * }}}
   */
