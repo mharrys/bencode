@@ -29,13 +29,13 @@ once inside sbt.
 ## Decode
 
     scala> decode("i42e")
-    => Right(BInt(42))
+    => Right(42)
 
     scala> decode("3:foo")
-    => Right(BStr(foo))
+    => Right(foo)
 
     scala> decode("li42e3:fooe")
-    => Right(BList(List(BInt(42), BStr(foo))))
+    => Right([42 foo])
 
     scala> decode("d3:fooi42ee")
-    => Right(BDict(Map(foo -> BInt(42))))
+    => Right({foo -> 42})
