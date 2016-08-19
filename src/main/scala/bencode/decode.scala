@@ -79,16 +79,15 @@ object decode {
       case d if d startsWith("e") =>
         Right((BDict(acc), data.tail))
       case d =>
-        decodeStr(data) match {
-          case Right((BStr(name), t1)) =>
-            decodeType(t1) match {
-              case Right((item, t2)) =>
-                parse(t2, acc + (name -> item))
-              case Left(error) =>
-                Left("Unable to parse dictionary item: " + error)
-            }
-          case _ =>
-            Left("Unable to parse dictionary name")
+        val result = for {
+          a <- decodeStr(data).right  // field name
+          b <- decodeType(a._2).right // item
+        } yield (a._1.value, b._1, b._2)
+        result match {
+          case Right((name, item, tail)) =>
+            parse(tail, acc + (name -> item))
+          case Left(error) =>
+            Left("Unable to parse dictionary element: " + error)
         }
     }
     parse(dataDict.tail, Map.empty)
