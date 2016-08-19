@@ -39,3 +39,40 @@ once inside sbt.
 
     scala> decode("d3:fooi42ee")
     => Right({foo -> 42})
+
+## Zipper
+The decoded results can easily be explored with a zipper.
+
+    val ds = decode("li42eld3:food3:barl5:helloeeeei100ee").right.get
+    // => [42 [{foo -> {bar -> [hello]}}] 100]
+
+    val z = BValueZipper(ds, Nil)
+    // => BValueZipper([42 [{foo -> {bar -> [hello]}}] 100],List())
+
+    val result = for {
+      z2 <- z.downList
+      z3 <- z2.forward
+      z4 <- z3.downList
+      z5 <- z4.downDict("foo")
+      z6 <- z5.downDict("bar")
+      z7 <- z6.downList
+      // replace the nested string "hello" with "world"
+      z8 = z7.set(BStr("world"))
+      z9 <- z8.up
+      z10 <- z9.up
+      // append new int to nested dictionary
+      z11 <- z10.putDict("zot", BInt(1337))
+    } yield (z11)
+
+    // walk up from dictionary focus to root and print result
+    result match {
+      case Some(z) =>
+        println(z.root.focus)
+      case None =>
+        println("Failure")
+    }
+    // => [42 [{foo -> {bar -> [world] zot -> 1337}}] 100]
+    //                          ^^^^^  ^^^^^^^^^^^
+    //                            |         |
+    //                            |         +- new item
+    //                            + hello replaced
