@@ -41,22 +41,16 @@ object decode {
   }
 
   private def decodeInt(dataInt: String): Either[String, (BInt, String)] = {
-    @annotation.tailrec
-    def parse(data: String, acc: Vector[Char]): Either[String, (BInt, String)] = data match {
-      case d if d.isEmpty =>
-        Left("Unexpected ending while parsing int")
-      case d if d startsWith("e") =>
-        val numberStr = acc.mkString
-        Try(numberStr.toInt) match {
-          case Success(n) =>
-            Right((BInt(n), data.tail))
-          case Failure(_) =>
-            Left(s"Unable to parse $numberStr as int")
-        }
-      case d =>
-        parse(data.tail, acc :+ d.head)
-    }
-    parse(dataInt.tail, Vector.empty)
+    val (numberStr, rest) = dataInt.tail.span(x => x != 'e') // dropping 'i'
+    if (rest.startsWith("e")) {
+      Try(numberStr.toInt) match {
+        case Success(n) =>
+          Right((BInt(n), rest.tail))
+        case Failure(_) =>
+          Left(s"Unable to parse $numberStr as int")
+      }
+    } else
+      Left("Unexpected ending while parsing int")
   }
 
   private def decodeList(dataList: String): Either[String, (BList, String)] = {
