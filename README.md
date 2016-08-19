@@ -9,7 +9,7 @@ This assumes sbt is installed and exist in your path.
     > test
 
 # Examples
-Remember to ``import bencode._`` before running the examples. Run ``console''
+Remember to ``import bencode._`` before running the examples. Run ``console``
 once inside sbt.
 
 ## Encode
